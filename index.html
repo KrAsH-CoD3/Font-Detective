@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Detective - Discover Your Font Fingerprint</title>
+    <meta name="description" content="Advanced font fingerprinting tool that analyzes your device's installed fonts to create a unique digital fingerprint.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="container">
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Font <span class="gradient-text">Detective</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Discover your device's unique font fingerprint
+                </p>
+            </div>
+        </header>
+
+        <!-- Font Detection Section -->
+        <section class="detection-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Font Detection Engine</h2>
+                    <div class="controls">
+                        <button id="scanBtn" class="btn btn-primary">
+                            <span id="scanText">Start Scan</span>
+                        </button>
+                        <button id="resetBtn" class="btn btn-icon" style="display: none;" aria-label="Reset Scan">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="progressContainer" class="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText" class="progress-text">Probing system fonts...</p>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsContainer" style="display: none;">
+                <!-- Fingerprint Summary -->
+                <div class="card">
+                    <h3>Your Font Fingerprint</h3>
+                    <div class="fingerprint-grid">
+                        <div class="fingerprint-item">
+                            <label>Fingerprint Hash</label>
+                            <code id="fingerprintHash" class="fingerprint-hash"></code>
+                        </div>
+                        <div class="fingerprint-item">
+                            <label>Uniqueness Score</label>
+                            <div class="score-container">
+                                <div id="uniquenessScore" class="score-value">0%</div>
+                                <span id="uniquenessLabel" class="score-badge">Calculating...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-box">
+                        <p id="summaryText">Font detection in progress...</p>
+                    </div>
+                </div>
+
+                <!-- Detected Fonts -->
+                <div class="card">
+                    <h3>Detected Fonts</h3>
+                    <div id="fontsGrid" class="fonts-grid"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
