@@ -25,7 +25,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./   # root folder since it's just static files
+          path: ./
 
   deploy:
     needs: build
@@ -40,11 +40,11 @@ jobs:
 
   preview:
     needs: build
+    if: github.event_name == 'pull_request'
     environment:
-      name: github-pages
+      name: github-pages-preview
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - name: Deploy Preview
         id: deployment
