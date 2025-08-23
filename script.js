@@ -206,11 +206,15 @@ class UIController {
         this.progressContainer.style.display = 'block';
         this.resultsContainer.style.display = 'block';
         this.resetBtn.style.display = 'none';
-        
+
         // Clear previous results
         this.fontsGrid.innerHTML = '';
         this.progressFill.style.width = '0%';
-        
+        this.fingerprintHash.textContent = '';
+        this.uniquenessScore.textContent = '';
+        this.uniquenessLabel.textContent = '';
+        this.summaryText.innerHTML = '';
+
         this.fontDetector.scan(
             (detectedCount, completed, total, lastFont) => this.updateProgress(detectedCount, completed, total, lastFont),
             (fonts, fingerprint, score) => this.displayResults(fonts, fingerprint, score)
