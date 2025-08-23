@@ -108,16 +108,19 @@ class FontDetector {
         return (hash >>> 0).toString(16).padStart(8, '0').substring(0, 16);
     }
 
-    // Calculate uniqueness score based on font count and rarity
+    // Calculate uniqueness score based on font count
     calculateUniquenessScore(fontCount) {
-        // Base score from font count
-        let score = Math.min(60, fontCount * 1.5);
+        // A non-linear function to map font count to a 0-100 score.
+        // This gives diminishing returns for each additional font, providing a more
+        // nuanced uniqueness score. The curve is adjusted to make scores above 90 rare.
+        const maxFonts = 200; // A reasonable upper bound for common systems
+        const normalizedCount = Math.min(fontCount, maxFonts);
         
-        // Add randomization for realistic variance
-        score += Math.random() * 20;
+        // Use a power function to create a curve where uniqueness grows slower as font count increases
+        const score = 100 * Math.pow(normalizedCount / maxFonts, 0.5);
         
-        // Ensure reasonable bounds
-        return Math.min(95, Math.max(15, Math.round(score)));
+        // Ensure score is within a sensible range (e.g., 5-99)
+        return Math.min(99, Math.max(5, Math.round(score)));
     }
 
     // Main scanning function, optimized with async chunks
@@ -176,6 +179,7 @@ class UIController {
     initializeElements() {
         this.scanBtn = document.getElementById('scanBtn');
         this.resetBtn = document.getElementById('resetBtn');
+        this.copyBtn = document.getElementById('copyBtn');
         this.scanText = document.getElementById('scanText');
         this.controls = this.scanBtn.parentElement;
         this.progressContainer = document.getElementById('progressContainer');
@@ -194,6 +198,7 @@ class UIController {
     bindEvents() {
         this.scanBtn.addEventListener('click', () => this.startScan());
         this.resetBtn.addEventListener('click', () => this.resetScan());
+        this.copyBtn.addEventListener('click', () => this.copyFonts());
     }
 
     startScan() {
@@ -203,11 +208,17 @@ class UIController {
         this.progressContainer.style.display = 'block';
         this.resultsContainer.style.display = 'block';
         this.resetBtn.style.display = 'none';
-        
+        this.copyBtn.style.display = 'none';
+        this.copyBtn.classList.remove('is-visible');
+
         // Clear previous results
         this.fontsGrid.innerHTML = '';
         this.progressFill.style.width = '0%';
-        
+        this.fingerprintHash.textContent = '';
+        this.uniquenessScore.textContent = '';
+        this.uniquenessLabel.textContent = '';
+        this.summaryText.innerHTML = '';
+
         this.fontDetector.scan(
             (detectedCount, completed, total, lastFont) => this.updateProgress(detectedCount, completed, total, lastFont),
             (fonts, fingerprint, score) => this.displayResults(fonts, fingerprint, score)
@@ -255,12 +266,65 @@ class UIController {
         this.scanText.textContent = 'Start Scan';
         this.progressContainer.style.display = 'none';
         this.resetBtn.style.display = 'inline-block';
+        this.copyBtn.style.display = 'inline-flex';
+        this.copyBtn.classList.add('is-visible');
+        
+        this.copyBtn.addEventListener('click', () => {
+            const fontNames = Array.from(this.fontsGrid.children)
+                .map(card => card.querySelector('.font-name').textContent)
+                .join(', ');
+
+            // Fallback for older browsers
+            if (!navigator.clipboard) {
+                const textarea = document.createElement('textarea');
+                textarea.value = fontNames;
+                textarea.style.position = 'fixed'; // Prevent scrolling to bottom of page in MS Edge.
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    this.showCopySuccess();
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textarea);
+                return;
+            }
+
+            navigator.clipboard.writeText(fontNames).then(() => this.showCopySuccess(), (err) => {
+                console.error('Async: Could not copy text: ', err);
+            });
+        });
+    }
+
+    showCopySuccess() {
+        const originalIcon = this.copyBtn.innerHTML;
+        this.copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        setTimeout(() => {
+            this.copyBtn.innerHTML = originalIcon;
+        }, 2000);
+    }
+
+    copyFonts() {
+        const fontListText = this.fontDetector.detectedFonts.join(', ');
+        navigator.clipboard.writeText(fontListText).then(() => {
+            const originalIcon = this.copyBtn.innerHTML;
+            this.copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(() => {
+                this.copyBtn.innerHTML = originalIcon;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy fonts: ', err);
+        });
     }
 
     resetScan() {
         this.fontDetector.reset();
         this.resultsContainer.style.display = 'none';
         this.resetBtn.style.display = 'none';
+        this.copyBtn.style.display = 'none';
+        this.copyBtn.classList.remove('is-visible');
         this.fontsGrid.innerHTML = '';
         this.progressFill.style.width = '0%';
         this.controls.classList.add('initial-state');
