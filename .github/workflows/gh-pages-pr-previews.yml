@@ -12,11 +12,18 @@ permissions:
   id-token: write
 
 jobs:
+
   # ---------------- Production deploy (main) ----------------
   production:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Upload site for deploy
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: ./
+    
       - name: Checkout main
         uses: actions/checkout@v4
         with:
