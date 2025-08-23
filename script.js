@@ -108,16 +108,19 @@ class FontDetector {
         return (hash >>> 0).toString(16).padStart(8, '0').substring(0, 16);
     }
 
-    // Calculate uniqueness score based on font count and rarity
+    // Calculate uniqueness score based on font count
     calculateUniquenessScore(fontCount) {
-        // Base score from font count
-        let score = Math.min(60, fontCount * 1.5);
+        // A non-linear function to map font count to a 0-100 score.
+        // This gives diminishing returns for each additional font, providing a more
+        // nuanced uniqueness score. The curve is adjusted to make scores above 90 rare.
+        const maxFonts = 200; // A reasonable upper bound for common systems
+        const normalizedCount = Math.min(fontCount, maxFonts);
         
-        // Add randomization for realistic variance
-        score += Math.random() * 20;
+        // Use a power function to create a curve where uniqueness grows slower as font count increases
+        const score = 100 * Math.pow(normalizedCount / maxFonts, 0.5);
         
-        // Ensure reasonable bounds
-        return Math.min(95, Math.max(15, Math.round(score)));
+        // Ensure score is within a sensible range (e.g., 5-99)
+        return Math.min(99, Math.max(5, Math.round(score)));
     }
 
     // Main scanning function, optimized with async chunks
