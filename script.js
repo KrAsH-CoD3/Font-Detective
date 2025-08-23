@@ -268,6 +268,42 @@ class UIController {
         this.resetBtn.style.display = 'inline-block';
         this.copyBtn.style.display = 'inline-flex';
         this.copyBtn.classList.add('is-visible');
+        
+        this.copyBtn.addEventListener('click', () => {
+            const fontNames = Array.from(this.fontsGrid.children)
+                .map(card => card.querySelector('.font-name').textContent)
+                .join(', ');
+
+            // Fallback for older browsers
+            if (!navigator.clipboard) {
+                const textarea = document.createElement('textarea');
+                textarea.value = fontNames;
+                textarea.style.position = 'fixed'; // Prevent scrolling to bottom of page in MS Edge.
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    this.showCopySuccess();
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textarea);
+                return;
+            }
+
+            navigator.clipboard.writeText(fontNames).then(() => this.showCopySuccess(), (err) => {
+                console.error('Async: Could not copy text: ', err);
+            });
+        });
+    }
+
+    showCopySuccess() {
+        const originalIcon = this.copyBtn.innerHTML;
+        this.copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        setTimeout(() => {
+            this.copyBtn.innerHTML = originalIcon;
+        }, 2000);
     }
 
     copyFonts() {
