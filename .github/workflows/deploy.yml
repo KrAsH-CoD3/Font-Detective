@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - "fixes"
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -28,6 +29,7 @@ jobs:
           path: ./
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build
     environment:
       name: github-pages
@@ -39,14 +41,15 @@ jobs:
         uses: actions/deploy-pages@v4
 
   preview:
+    if: github.ref != 'refs/heads/main'
     needs: build
-    if: github.event_name == 'pull_request'
     environment:
       name: github-pages-preview
+      url: ${{ steps.preview.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy Preview
-        id: deployment
+        id: preview
         uses: actions/deploy-pages@v4
         with:
           preview: true
