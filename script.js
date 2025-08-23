@@ -179,6 +179,7 @@ class UIController {
     initializeElements() {
         this.scanBtn = document.getElementById('scanBtn');
         this.resetBtn = document.getElementById('resetBtn');
+        this.copyBtn = document.getElementById('copyBtn');
         this.scanText = document.getElementById('scanText');
         this.controls = this.scanBtn.parentElement;
         this.progressContainer = document.getElementById('progressContainer');
@@ -197,6 +198,7 @@ class UIController {
     bindEvents() {
         this.scanBtn.addEventListener('click', () => this.startScan());
         this.resetBtn.addEventListener('click', () => this.resetScan());
+        this.copyBtn.addEventListener('click', () => this.copyFonts());
     }
 
     startScan() {
@@ -206,6 +208,8 @@ class UIController {
         this.progressContainer.style.display = 'block';
         this.resultsContainer.style.display = 'block';
         this.resetBtn.style.display = 'none';
+        this.copyBtn.style.display = 'none';
+        this.copyBtn.classList.remove('is-visible');
 
         // Clear previous results
         this.fontsGrid.innerHTML = '';
@@ -262,12 +266,29 @@ class UIController {
         this.scanText.textContent = 'Start Scan';
         this.progressContainer.style.display = 'none';
         this.resetBtn.style.display = 'inline-block';
+        this.copyBtn.style.display = 'inline-flex';
+        this.copyBtn.classList.add('is-visible');
+    }
+
+    copyFonts() {
+        const fontListText = this.fontDetector.detectedFonts.join(', ');
+        navigator.clipboard.writeText(fontListText).then(() => {
+            const originalIcon = this.copyBtn.innerHTML;
+            this.copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(() => {
+                this.copyBtn.innerHTML = originalIcon;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy fonts: ', err);
+        });
     }
 
     resetScan() {
         this.fontDetector.reset();
         this.resultsContainer.style.display = 'none';
         this.resetBtn.style.display = 'none';
+        this.copyBtn.style.display = 'none';
+        this.copyBtn.classList.remove('is-visible');
         this.fontsGrid.innerHTML = '';
         this.progressFill.style.width = '0%';
         this.controls.classList.add('initial-state');

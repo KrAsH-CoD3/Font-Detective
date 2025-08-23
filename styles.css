@@ -72,6 +72,10 @@ body {
     color: #f4f4f5;
 }
 
+.card .detected-fonts-header + .fonts-grid {
+    margin-top: 0;
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -293,6 +297,39 @@ body {
     font-size: 0.75rem;
     color: #a1a1aa;
     font-style: italic;
+}
+
+/* Detected Fonts Header */
+.detected-fonts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.detected-fonts-header h3 {
+    margin-bottom: 0;
+}
+
+/* Special animation for Copy Button */
+#copyBtn {
+    display: none; /* Hidden by default */
+}
+
+#copyBtn.is-visible {
+    display: inline-flex;
+    animation: bounce-and-rest 4s ease-in-out infinite;
+}
+
+
+#copyBtn .feather-check {
+    color: #22c55e; /* Green checkmark */
+}
+
+@keyframes bounce-and-rest {
+    0%, 25%, 100% { transform: translateY(0); }
+    10% { transform: translateY(-10px); }
+    15% { transform: translateY(-5px); }
 }
 
 /* Animations */
