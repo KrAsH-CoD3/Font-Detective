@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -29,6 +29,7 @@ jobs:
         with:
           path: ./
           name: github-pages
+          overwrite: true
           if-no-files-found: error
 
       - name: Deploy production
@@ -43,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR merge commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -53,8 +54,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./
           name: github-pages-pr-${{ github.event.pull_request.number }}
+          path: ./
+          overwrite: true
           if-no-files-found: error
 
       - name: Deploy PR preview
