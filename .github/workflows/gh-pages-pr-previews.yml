@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -18,21 +18,20 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Upload site for deploy
-        uses: actions/upload-artifact@v4
-        with:
-          name: github-pages
-          path: ./
-    
       - name: Checkout main
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Deploy production
-        uses: actions/deploy-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./
+
+      - name: Deploy production
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   # ---------------- PR Preview deploy ----------------
   pr_preview:
@@ -43,13 +42,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./
 
       - name: Deploy PR preview
         id: prdeploy
         uses: actions/deploy-pages@v4
         with:
-          path: ./
           preview: true
 
       - name: Comment PR with preview URL
@@ -58,13 +63,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const pr = context.payload.pull_request.number;
-            const url = steps.prdeploy.outputs.page_url;
-            await github.issues.createComment({
+            const url = '${{ steps.prdeploy.outputs.page_url }}';
+            github.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr,
               body: `✅ PR Preview URL: ${url}`
-            })
+            });
 
   # ---------------- PR Preview cleanup ----------------
   pr_cleanup:
@@ -72,9 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete PR preview
-        id: delete_preview
         uses: actions/deploy-pages@v4
         with:
-          path: ./
           preview: true
           delete: true
