@@ -72,7 +72,6 @@ jobs:
           script: |
             const pr = context.payload.pull_request.number;
             const url = "${{ steps.prdeploy.outputs.page_url }}";
-            //console.log(github.rest.issues.createComment);
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
