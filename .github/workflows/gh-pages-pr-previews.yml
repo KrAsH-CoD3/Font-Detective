@@ -29,8 +29,6 @@ jobs:
         with:
           path: ./
           name: github-pages
-          overwrite: true
-          if-no-files-found: error
 
       - name: Deploy production
         id: deployment
@@ -56,8 +54,6 @@ jobs:
         with:
           name: github-pages-pr-${{ github.event.pull_request.number }}
           path: ./
-          overwrite: true
-          if-no-files-found: error
 
       - name: Deploy PR preview
         id: prdeploy
