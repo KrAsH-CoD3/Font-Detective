@@ -25,7 +25,7 @@ Visit [**Font-Detective**](https://krash-cod3.github.io/Font-Detective/) to anal
 
 ## 📚 Font Database
 
-The tool's effectiveness comes from its large and diverse font database, which is organized into several categories:
+The tool's effectiveness comes from its large and diverse font database, which is organized into several categories;
 
 - **Popular Fonts**: Common system and design fonts.
 - **Extended List**: A broad collection of less common fonts.
