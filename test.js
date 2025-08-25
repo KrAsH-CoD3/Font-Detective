@@ -1,4 +1,2 @@
 // This is a test file for PR workflow trigger
-console.log("One");
-console.log("Two");
-console.log("Three");
+// Testing to see if workflow files works without pull-request permission
