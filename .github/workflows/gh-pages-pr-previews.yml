@@ -7,10 +7,10 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 permissions:
-  contents: read
   pages: write
+  contents: read
   id-token: write
-  issues: write
+  pull-requests: write
 
 jobs:
 
